@@ -1,0 +1,3 @@
+namespace PlatformFoundation.WebApi.Contracts.Responses;
+
+public sealed record ProductResponse(Guid Id, string Name, decimal Price);

@@ -56,3 +56,31 @@ Domain ← Application ← Infrastructure ← WebApi
 - WebApi: Contracts/Requests + Contracts/Responses
 - Domain: Entities, ValueObjects, Exceptions
 - Infrastructure: Persistence, Repositories
+
+## API Contracts & Mapping Rules
+
+### WebApi Contracts (HTTP boundary)
+- WebApi owns HTTP contracts:
+    - Requests: WebApi/Contracts/Requests
+    - Responses: WebApi/Contracts/Responses
+- WebApi contracts are NOT referenced by Application/Domain/Infrastructure.
+
+### Application Results (use-case outputs)
+- Application returns Result models (not IActionResult, not WebApi DTOs).
+- Result models are stable and represent the outcome of a use-case.
+
+### Mapping rule
+- Controllers map:
+    - Request DTO -> Application Command/Query
+    - Application Result -> Response DTO
+- No mapping logic lives in Application (unless it’s domain/business transformation).
+
+### Naming conventions
+- Application:
+    - Commands: CreateXCommand / UpdateXCommand
+    - Queries: GetXQuery / ListXQuery
+    - Handlers: CreateXHandler / GetXHandler
+    - Results: XResult / CreateXResult
+- WebApi:
+    - Requests: CreateXRequest / UpdateXRequest
+    - Responses: XResponse / XDetailsResponse

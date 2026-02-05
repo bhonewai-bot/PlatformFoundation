@@ -9,8 +9,15 @@ namespace PlatformFoundation.WebApi.Controllers
     [ApiController]
     public class PingController : ControllerBase
     {
+        private readonly GetPingHandler _handler;
+
+        public PingController(GetPingHandler handler)
+        {
+            _handler = handler;
+        }
+
         [HttpGet]
-        public async Task<IActionResult> Get(GetPingHandler handler, CancellationToken ct)
+        public async Task<ActionResult<PingResponse>> Get(GetPingHandler handler, CancellationToken ct)
         {
             var result = await handler.Handle(new GetPingQuery(), ct);
             
