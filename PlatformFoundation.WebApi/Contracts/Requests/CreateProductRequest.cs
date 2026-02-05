@@ -1,3 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace PlatformFoundation.WebApi.Contracts.Requests;
 
-public sealed record CreateProductRequest(string Name, decimal Price);
+public sealed record CreateProductRequest(
+    [param: Required]
+    [param: MaxLength(100)]
+    string Name,
+    
+    [param: Range(0, double.MaxValue)]
+    decimal Price
+);

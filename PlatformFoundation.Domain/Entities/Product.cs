@@ -1,3 +1,5 @@
+using PlatformFoundation.Domain.Exceptions;
+
 namespace PlatformFoundation.Domain.Entities;
 
 public sealed class Product
@@ -9,13 +11,13 @@ public sealed class Product
     private Product(Guid id, string name, decimal price)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Product name is required", nameof(name));
+            throw new DomainValidationException("Product name is required");
         
         if (name.Length > 100)
-            throw new ArgumentException("Product name is too long", nameof(name));
+            throw new DomainValidationException("Product name is too long");
         
         if (price <= 0)
-            throw new ArgumentException("Product price must be greater than 0.", nameof(price));
+            throw new DomainValidationException("Product price must be greater than 0.");
         
         Id = id;
         Name = name;
