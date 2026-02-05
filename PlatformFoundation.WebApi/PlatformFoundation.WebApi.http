@@ -1,0 +1,6 @@
+@PlatformFoundation.WebApi_HostAddress = http://localhost:5064
+
+GET {{PlatformFoundation.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
