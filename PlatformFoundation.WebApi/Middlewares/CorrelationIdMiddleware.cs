@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Primitives;
+using Serilog.Context;
 
 namespace PlatformFoundation.WebApi.Middlewares;
 
@@ -7,12 +7,10 @@ public sealed class CorrelationIdMiddleware
     public const string HeaderName = "X-Correlation-ID";
     
     private readonly RequestDelegate _next;
-    private readonly ILogger<CorrelationIdMiddleware> _logger;
 
-    public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
+    public CorrelationIdMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
     }
 
     public async Task Invoke(HttpContext context)
@@ -27,10 +25,7 @@ public sealed class CorrelationIdMiddleware
             return Task.CompletedTask;
         });
 
-        using (_logger.BeginScope(new Dictionary<string, object>
-        {
-            ["CorrelationId"] = correlationId
-        }))
+        using (LogContext.PushProperty("CorrelationId", correlationId))
         {
             await _next(context);
         }

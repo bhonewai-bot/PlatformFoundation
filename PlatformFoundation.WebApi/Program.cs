@@ -5,8 +5,17 @@ using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
 using PlatformFoundation.WebApi.Infrastructure;
 using PlatformFoundation.WebApi.Middlewares;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .CreateLogger();
+
+builder.Host.UseSerilog(Log.Logger);
 
 // Add services to the container.
 builder.Services.AddApplication();
@@ -52,6 +61,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+
+    options.EnrichDiagnosticContext = (diagnostic, context) =>
+    {
+        if (context.Items.TryGetValue("X-Correlation-ID", out var cidObj) && cidObj is string cid)
+            diagnostic.Set("CorrelationId", cid);
+        
+        diagnostic.Set("TraceIdentifier", context.TraceIdentifier);
+        diagnostic.Set("Endpoint", context.GetEndpoint()?.DisplayName);
+        diagnostic.Set("ClientIp", context.Connection.RemoteIpAddress?.ToString());
+        diagnostic.Set("UserAgent", context.Request.Headers.UserAgent.ToString());
+    };
+});
 
 app.UseHttpsRedirection();
 
