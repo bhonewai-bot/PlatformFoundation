@@ -1,6 +1,7 @@
 using System.Text.Json;
 using PlatformFoundation.Domain.Exceptions;
 using PlatformFoundation.WebApi.Contracts.Responses;
+using PlatformFoundation.WebApi.Extensions;
 
 namespace PlatformFoundation.WebApi.Middlewares;
 
@@ -31,7 +32,7 @@ public class ExceptionHandlingMiddleware
 
     private static async Task WriteErrorResponse(HttpContext context, Exception ex)
     {
-        var traceId = context.TraceIdentifier;
+        var traceId = context.GetCorrelationId();
 
         var (status, title, detail) = ex switch
         {

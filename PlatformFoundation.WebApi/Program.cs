@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlatformFoundation.Application;
 using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.WebApi.Contracts.Responses;
+using PlatformFoundation.WebApi.Extensions;
 using PlatformFoundation.WebApi.Infrastructure;
 using PlatformFoundation.WebApi.Middlewares;
 
@@ -17,7 +18,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
     {
-        var traceId = context.HttpContext.TraceIdentifier;
+        var traceId = context.HttpContext.GetCorrelationId();
 
         var errors = context.ModelState
             .Where(x => x.Value?.Errors.Count > 0)
@@ -49,6 +50,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
