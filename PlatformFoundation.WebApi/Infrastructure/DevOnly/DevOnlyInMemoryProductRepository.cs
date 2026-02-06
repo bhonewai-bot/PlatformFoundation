@@ -1,9 +1,9 @@
 using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.Domain.Entities;
 
-namespace PlatformFoundation.WebApi.Infrastructure;
+namespace PlatformFoundation.WebApi.Infrastructure.DevOnly;
 
-public sealed class InMemoryProductRepository : IProductRepository
+public sealed class DevOnlyInMemoryProductRepository : IProductRepository
 {
     private static readonly Dictionary<Guid, Product> Store = new();
 

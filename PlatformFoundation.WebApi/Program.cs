@@ -3,7 +3,7 @@ using PlatformFoundation.Application;
 using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
-using PlatformFoundation.WebApi.Infrastructure;
+using PlatformFoundation.WebApi.Infrastructure.DevOnly;
 using PlatformFoundation.WebApi.Middlewares;
 using Serilog;
 
@@ -19,7 +19,7 @@ builder.Host.UseSerilog(Log.Logger);
 
 // Add services to the container.
 builder.Services.AddApplication();
-builder.Services.AddScoped<IProductRepository, InMemoryProductRepository>();
+builder.Services.AddScoped<IProductRepository, DevOnlyInMemoryProductRepository>();
 
 builder.Services.AddControllers();
 
