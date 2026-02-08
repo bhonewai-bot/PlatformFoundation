@@ -22,7 +22,7 @@ builder.Host.UseSerilog(Log.Logger);
 
 // Add services to the container.
 builder.Services.AddHealthChecks()
-    .AddCheck("self", () => HealthCheckResult.Healthy());
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live", "ready" });
 builder.Services.AddApplication();
 builder.Services.AddScoped<IProductRepository, DevOnlyInMemoryProductRepository>();
 
@@ -103,10 +103,12 @@ app.MapControllers();
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions()
 {
+    Predicate = r => r.Tags.Contains("live"),
     ResponseWriter = HealthResponseWriter.WriteJsonResponse
 });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions()
 {
+    Predicate = r => r.Tags.Contains("ready"),
     ResponseWriter = HealthResponseWriter.WriteJsonResponse
 });
 
