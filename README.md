@@ -13,3 +13,6 @@ See docs/architecture.md for rules and layering.
 ```bash
 dotnet run --project PlatformFoundation.WebApi
 ```
+
+### App info
+- `GET /api/info` returns app metadata (environment/version) for debugging deployments.
