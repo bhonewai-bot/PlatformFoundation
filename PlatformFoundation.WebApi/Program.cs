@@ -6,6 +6,7 @@ using PlatformFoundation.WebApi.Extensions;
 using PlatformFoundation.WebApi.Infrastructure.DevOnly;
 using PlatformFoundation.WebApi.Middlewares;
 using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,11 +61,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+
+    options.GetLevel = (context, elapsed, ex) =>
+    {
+        if (ex != null) return LogEventLevel.Error;
+
+        if (context.Response.StatusCode >= 500) return LogEventLevel.Error;
+
+        return LogEventLevel.Information;
+    };
 
     options.EnrichDiagnosticContext = (diagnostic, context) =>
     {
@@ -77,6 +86,8 @@ app.UseSerilogRequestLogging(options =>
         diagnostic.Set("UserAgent", context.Request.Headers.UserAgent.ToString());
     };
 });
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

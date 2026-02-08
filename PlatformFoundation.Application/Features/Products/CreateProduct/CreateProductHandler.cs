@@ -18,6 +18,8 @@ public sealed class CreateProductHandler
         
         await _repo.Add(product, ct);
         
+        throw new Exception("boom");
+        
         return new CreateProductResult(product.Id, product.Name, product.Price);
     }
 }

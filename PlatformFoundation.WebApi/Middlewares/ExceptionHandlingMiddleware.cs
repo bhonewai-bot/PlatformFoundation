@@ -24,7 +24,14 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception.");
+            if (ex is DomainValidationException)
+            {
+                _logger.LogWarning("Domain validation failed: {Message}", ex.Message);
+            }
+            else
+            {
+                _logger.LogError(ex, "Unhandled exception.");
+            }
             
             await WriteErrorResponse(context, ex);
         }

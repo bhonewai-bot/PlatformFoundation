@@ -84,3 +84,8 @@ Domain ← Application ← Infrastructure ← WebApi
 - WebApi:
     - Requests: CreateXRequest / UpdateXRequest
     - Responses: XResponse / XDetailsResponse
+
+### Log behavior matrix
+- 2xx: request log only (INF)
+- 4xx validation: request log only (INF)
+- 5xx exception: request log (INF) + exception log once (ERR) in exception middleware
