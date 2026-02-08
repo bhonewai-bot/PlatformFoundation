@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using PlatformFoundation.Application;
 using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.WebApi.Contracts.Responses;
@@ -19,6 +21,8 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog(Log.Logger);
 
 // Add services to the container.
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy());
 builder.Services.AddApplication();
 builder.Services.AddScoped<IProductRepository, DevOnlyInMemoryProductRepository>();
 
@@ -68,8 +72,10 @@ app.UseSerilogRequestLogging(options =>
 
     options.GetLevel = (context, elapsed, ex) =>
     {
+        var path = context.Request.Path.Value ?? "";
+        if (path.StartsWith("/health")) return LogEventLevel.Verbose;
+        
         if (ex != null) return LogEventLevel.Error;
-
         if (context.Response.StatusCode >= 500) return LogEventLevel.Error;
 
         return LogEventLevel.Information;
@@ -94,5 +100,14 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions()
+{
+    ResponseWriter = HealthResponseWriter.WriteJsonResponse
+});
+app.MapHealthChecks("/health/ready", new HealthCheckOptions()
+{
+    ResponseWriter = HealthResponseWriter.WriteJsonResponse
+});
 
 app.Run();
