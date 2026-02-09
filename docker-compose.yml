@@ -1,0 +1,15 @@
+services:
+    postgres: 
+        image: postgres:16
+        container_name: platformfoundation-postgres
+        environment:
+            POSTGRES_USER: pf_user
+            POSTGRES_PASSWORD: pf_pass
+            POSTGRES_DB: platformfoundation
+        ports:
+            -   "5432:5432"
+        volumes:
+            -   pf_pgdata:/var/lib/postgresql/data
+
+volumes:
+    pf_pgdata:

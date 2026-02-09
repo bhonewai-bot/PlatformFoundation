@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using PlatformFoundation.Application;
 using PlatformFoundation.Application.Contracts;
+using PlatformFoundation.Infrastructure;
 using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
 using PlatformFoundation.WebApi.Infrastructure.DevOnly;
@@ -24,6 +25,7 @@ builder.Host.UseSerilog(Log.Logger);
 builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live", "ready" });
 builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IProductRepository, DevOnlyInMemoryProductRepository>();
 
 builder.Services.AddControllers();
