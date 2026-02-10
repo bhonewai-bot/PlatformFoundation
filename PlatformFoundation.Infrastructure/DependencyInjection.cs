@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.Infrastructure.AppDbContext;
+using PlatformFoundation.Infrastructure.Persistence;
 using PlatformFoundation.Infrastructure.Repositories;
 
 namespace PlatformFoundation.Infrastructure;
@@ -17,6 +18,7 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         services.AddScoped<IProductRepository, EfProductRepository>();
+        services.AddScoped<IUnitOfWork, EfUnitOfWork>();
         
         return services;
     }

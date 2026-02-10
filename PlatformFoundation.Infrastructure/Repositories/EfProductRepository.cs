@@ -17,7 +17,6 @@ public sealed class EfProductRepository : IProductRepository
     public async Task Add(Product product, CancellationToken ct)
     {
         await _db.Products.AddAsync(product, ct);
-        await _db.SaveChangesAsync(ct);
     }
 
     public Task<Product?> GetById(Guid id, CancellationToken ct)
