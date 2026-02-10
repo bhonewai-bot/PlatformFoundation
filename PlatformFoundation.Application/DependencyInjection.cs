@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PlatformFoundation.Application.Features.Ping.GetPing;
 using PlatformFoundation.Application.Features.Products.CreateProduct;
+using PlatformFoundation.Application.Features.Products.GetProductById;
 
 namespace PlatformFoundation.Application;
 
@@ -10,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddScoped<GetPingHandler>();
         services.AddScoped<CreateProductHandler>();
+        services.AddScoped<GetProductByIdHandler>();
         
         return services;
     }

@@ -26,7 +26,6 @@ builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live", "ready" });
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddScoped<IProductRepository, DevOnlyInMemoryProductRepository>();
 
 builder.Services.AddControllers();
 
