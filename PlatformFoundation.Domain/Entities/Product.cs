@@ -4,9 +4,11 @@ namespace PlatformFoundation.Domain.Entities;
 
 public sealed class Product
 {
-    public Guid Id { get; }
-    public string Name { get; }
-    public decimal Price { get; }
+    public Guid Id { get; private set; }
+    public string Name { get; private set; }
+    public decimal Price { get; private set; }
+    
+    private Product() { }
 
     private Product(Guid id, string name, decimal price)
     {
