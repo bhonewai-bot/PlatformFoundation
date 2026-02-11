@@ -89,3 +89,10 @@ Domain ← Application ← Infrastructure ← WebApi
 - 2xx: request log only (INF)
 - 4xx validation: request log only (INF)
 - 5xx exception: request log (INF) + exception log once (ERR) in exception middleware
+
+## Boundary enforcement
+
+To verify layering boundaries:
+```bash
+./scripts/verify-boundaries.sh
+```
