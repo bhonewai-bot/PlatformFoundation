@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformFoundation.Application.Features.Products.CreateProduct;
 using PlatformFoundation.Application.Features.Products.GetProductById;
+using PlatformFoundation.Application.Features.Products.ListProducts;
 using PlatformFoundation.WebApi.Contracts.Requests;
 using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
@@ -14,11 +15,13 @@ public sealed class ProductsController : ControllerBase
 {
     private readonly CreateProductHandler _create;
     private readonly GetProductByIdHandler _getById;
+    private readonly ListProductsHandler _list;
 
-    public ProductsController(CreateProductHandler create, GetProductByIdHandler getById)
+    public ProductsController(CreateProductHandler create, GetProductByIdHandler getById, ListProductsHandler list)
     {
         _create = create;
         _getById = getById;
+        _list = list;
     }
 
     [HttpPost]
@@ -45,5 +48,19 @@ public sealed class ProductsController : ControllerBase
                 Detail: "Product not found."));
         
         return Ok(new ProductResponse(result.Id, result.Name, result.Price));
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<List<ProductResponse>>> List([FromQuery] int limit = 20, [FromQuery] int offset = 0, CancellationToken ct = default)
+    {
+        var result = await _list.Handle(new ListProductsQuery(limit, offset), ct);
+        
+        var response = new ListProductsResponse(
+            result.Limit,
+            result.Offset,
+            result.Count,
+            result.Items.Select(x => new ProductListItemResponse(x.Id, x.Name, x.Price)).ToList());
+        
+        return Ok(response);
     }
 }

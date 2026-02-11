@@ -25,4 +25,23 @@ public sealed class EfProductRepository : IProductRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
     }
+
+    public async Task<IReadOnlyList<Product>> List(int limit, int offset, CancellationToken ct)
+    {
+        if (limit <= 0) limit = 20;
+        if (limit > 100) limit = 100;
+        if (offset < 0) offset = 0;
+        
+        return await _db.Products
+            .AsNoTracking()
+            .OrderBy(x => x.Name)
+            .Skip(offset)
+            .Take(limit)
+            .ToListAsync(ct);
+    }
+
+    public Task<int> Count(CancellationToken ct)
+    {
+        return _db.Products.CountAsync(ct);
+    }
 }

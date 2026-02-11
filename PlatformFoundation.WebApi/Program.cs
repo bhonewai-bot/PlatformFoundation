@@ -6,7 +6,6 @@ using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.Infrastructure;
 using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
-using PlatformFoundation.WebApi.Infrastructure.DevOnly;
 using PlatformFoundation.WebApi.Middlewares;
 using Serilog;
 using Serilog.Events;
