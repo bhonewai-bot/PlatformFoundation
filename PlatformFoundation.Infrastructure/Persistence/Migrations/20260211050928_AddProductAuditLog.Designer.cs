@@ -9,11 +9,11 @@ using PlatformFoundation.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace PlatformFoundation.Infrastructure.AppDbContext.Migrations
+namespace PlatformFoundation.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(PlatformFoundationDbContext))]
-    [Migration("20260209145253_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260211050928_AddProductAuditLog")]
+    partial class AddProductAuditLog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,6 @@ namespace PlatformFoundation.Infrastructure.AppDbContext.Migrations
             modelBuilder.Entity("PlatformFoundation.Domain.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -37,11 +36,38 @@ namespace PlatformFoundation.Infrastructure.AppDbContext.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("products", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_products_price_gt_0", "\"Price\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("PlatformFoundation.Domain.Entities.ProductAuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("product_audit_logs", (string)null);
                 });
 #pragma warning restore 612, 618
         }

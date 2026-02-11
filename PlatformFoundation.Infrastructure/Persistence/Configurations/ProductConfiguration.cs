@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PlatformFoundation.Domain.Entities;
 
-namespace PlatformFoundation.Infrastructure.AppDbContext.Configurations;
+namespace PlatformFoundation.Infrastructure.Persistence.Configurations;
 
 public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {

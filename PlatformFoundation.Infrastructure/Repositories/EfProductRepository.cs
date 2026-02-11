@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.Domain.Entities;
-using PlatformFoundation.Infrastructure.AppDbContext;
+using PlatformFoundation.Infrastructure.Persistence;
 
 namespace PlatformFoundation.Infrastructure.Repositories;
 

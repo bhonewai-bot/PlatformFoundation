@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using PlatformFoundation.Infrastructure.AppDbContext;
+using PlatformFoundation.Infrastructure.Persistence;
 
 #nullable disable
 
@@ -42,6 +42,29 @@ namespace PlatformFoundation.Infrastructure.AppDbContext.Migrations
                         {
                             t.HasCheckConstraint("ck_products_price_gt_0", "\"Price\" > 0");
                         });
+                });
+
+            modelBuilder.Entity("PlatformFoundation.Domain.Entities.ProductAuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("product_audit_logs", (string)null);
                 });
 #pragma warning restore 612, 618
         }

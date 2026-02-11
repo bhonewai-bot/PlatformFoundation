@@ -18,6 +18,7 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         services.AddScoped<IProductRepository, EfProductRepository>();
+        services.AddScoped<IProductAuditLogRepository, EfProductAuditLogRepository>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
         
         return services;
