@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using PlatformFoundation.Application;
-using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.Infrastructure;
 using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
 using PlatformFoundation.WebApi.Middlewares;
 using Serilog;
 using Serilog.Events;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,52 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var key = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+            factory: _ => new FixedWindowRateLimiterOptions()
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+    });
+
+    options.AddFixedWindowLimiter("write-strict", policy =>
+    {
+        policy.PermitLimit = 10;
+        policy.Window = TimeSpan.FromMinutes(1);
+        policy.QueueLimit = 0;
+    });
+
+    options.OnRejected = async (context, ct) =>
+    {
+        var http = context.HttpContext;
+
+        var traceId = http.GetCorrelationId();
+
+        http.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        http.Response.ContentType = "application/json";
+
+        var payload = new ErrorResponse(
+            TraceId: traceId,
+            Status: StatusCodes.Status429TooManyRequests,
+            Title: "Too many requests",
+            Detail: "Rate limit exceeded. Please try again later.",
+            Errors: null);
+
+        await http.Response.WriteAsJsonAsync(payload, ct);
+    };
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -65,6 +112,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<CorrelationIdMiddleware>();
+
+app.UseRateLimiter();
 
 app.UseSerilogRequestLogging(options =>
 {

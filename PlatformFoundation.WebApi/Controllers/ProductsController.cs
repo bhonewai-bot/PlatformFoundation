@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PlatformFoundation.Application.Features.Products.CreateProduct;
 using PlatformFoundation.Application.Features.Products.GetProductById;
 using PlatformFoundation.Application.Features.Products.ListProducts;
@@ -24,6 +25,7 @@ public sealed class ProductsController : ControllerBase
         _list = list;
     }
 
+    [EnableRateLimiting("write-strict")]
     [HttpPost]
     public async Task<ActionResult<ProductResponse>> Create([FromBody] CreateProductRequest request,
         CancellationToken ct)
