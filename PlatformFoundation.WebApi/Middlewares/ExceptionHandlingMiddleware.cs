@@ -1,4 +1,3 @@
-using System.Text.Json;
 using PlatformFoundation.Domain.Exceptions;
 using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
@@ -22,6 +21,7 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        
         catch (Exception ex)
         {
             if (ex is DomainValidationException)
@@ -46,7 +46,7 @@ public class ExceptionHandlingMiddleware
             DomainValidationException dve => (StatusCodes.Status400BadRequest, "Validation failed", dve.Message),
             DomainException de => (StatusCodes.Status400BadRequest, "Domain error", de.Message),
 
-            _ => (StatusCodes.Status500InternalServerError, "Server error", "An unexpected error occured.")
+            _ => (StatusCodes.Status500InternalServerError, "Server error", "An unexpected error occurred.")
         };
         
         context.Response.ContentType = "application/json";
@@ -56,13 +56,10 @@ public class ExceptionHandlingMiddleware
             TraceId: traceId,
             Status: status,
             Title: title,
-            Detail: detail);
+            Detail: detail,
+            Errors: null);
 
-        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
 
-        await context.Response.WriteAsync(json);
+        await context.Response.WriteAsJsonAsync(payload);
     }
 }

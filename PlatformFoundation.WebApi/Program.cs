@@ -45,7 +45,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             TraceId: traceId,
             Status: StatusCodes.Status400BadRequest,
             Title: "Validation failed",
-            Detail: "One or more validation errors occured.",
+            Detail: "One or more validation errors occurred.",
             Errors: errors);
         
         return new BadRequestObjectResult(payload);
