@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformFoundation.Applicat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformFoundation.Infrastructure", "PlatformFoundation.Infrastructure\PlatformFoundation.Infrastructure.csproj", "{B6FEF8CD-8C11-4FB8-ADDF-1F5C00DC82FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformFoundation.IntegrationTests", "PlatformFoundation.IntegrationTests\PlatformFoundation.IntegrationTests.csproj", "{05E91CEB-19FA-4B4B-BED2-69A043E3145D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{B6FEF8CD-8C11-4FB8-ADDF-1F5C00DC82FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6FEF8CD-8C11-4FB8-ADDF-1F5C00DC82FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6FEF8CD-8C11-4FB8-ADDF-1F5C00DC82FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05E91CEB-19FA-4B4B-BED2-69A043E3145D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05E91CEB-19FA-4B4B-BED2-69A043E3145D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05E91CEB-19FA-4B4B-BED2-69A043E3145D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05E91CEB-19FA-4B4B-BED2-69A043E3145D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
