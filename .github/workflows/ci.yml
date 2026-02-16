@@ -1,0 +1,27 @@
+name: ci
+
+on:
+    push:
+      branches: ["main"]
+    pull_request: 
+
+jobs: 
+    build-and-verify:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with: 
+                  dotnet-version: "8.0.x"
+                  
+            - name: Install ripgrep
+              run: sudo apt-get update && sudo apt-get install -y ripgrep
+              
+            - name: Boundary checks
+              run: ./scripts/verify-boundaries.sh
+              
+            - name: Build
+              run: dotnet build
