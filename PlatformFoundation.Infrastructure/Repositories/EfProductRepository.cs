@@ -44,4 +44,12 @@ public sealed class EfProductRepository : IProductRepository
     {
         return _db.Products.CountAsync(ct);
     }
+
+    public Task<bool> ExistsByName(string name, CancellationToken ct)
+    {
+        var normalized = name.Trim().ToLower();
+        return _db.Products
+            .AsNoTracking()
+            .AnyAsync(x => x.Name.ToLower() == normalized, ct);
+    }
 }

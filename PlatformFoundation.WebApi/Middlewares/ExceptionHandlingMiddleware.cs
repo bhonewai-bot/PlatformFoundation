@@ -1,5 +1,5 @@
 using PlatformFoundation.Domain.Exceptions;
-using PlatformFoundation.WebApi.Contracts.Responses;
+using PlatformFoundation.WebApi.Errors;
 using PlatformFoundation.WebApi.Extensions;
 
 namespace PlatformFoundation.WebApi.Middlewares;
@@ -21,10 +21,9 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
-        
         catch (Exception ex)
         {
-            if (ex is DomainValidationException)
+            if (ex is DomainValidationException || ex is DomainConflictException)
             {
                 _logger.LogWarning("Domain validation failed: {Message}", ex.Message);
             }
@@ -41,24 +40,16 @@ public class ExceptionHandlingMiddleware
     {
         var traceId = context.GetCorrelationId();
 
-        var (status, title, detail) = ex switch
+        var (status, payload) = ex switch
         {
-            DomainValidationException dve => (StatusCodes.Status400BadRequest, "Validation failed", dve.Message),
-            DomainException de => (StatusCodes.Status400BadRequest, "Domain error", de.Message),
-
-            _ => (StatusCodes.Status500InternalServerError, "Server error", "An unexpected error occurred.")
+            DomainValidationException dve => (400, ErrorFactory.ValidationFailed(traceId, dve.Message)),
+            DomainConflictException dce => (409, ErrorFactory.Conflict(traceId, dce.Message)),
+            DomainException de => (400, ErrorFactory.ValidationFailed(traceId, de.Message)),
+            _ => (500, ErrorFactory.ServerError(traceId))
         };
         
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = status;
-        
-        var payload = new ErrorResponse(
-            TraceId: traceId,
-            Status: status,
-            Title: title,
-            Detail: detail,
-            Errors: null);
-
 
         await context.Response.WriteAsJsonAsync(payload);
     }

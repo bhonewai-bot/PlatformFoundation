@@ -10,6 +10,7 @@ using Serilog;
 using Serilog.Events;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using PlatformFoundation.WebApi.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,12 +42,16 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
                 kvp => kvp.Key,
                 kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
 
-        var payload = new ErrorResponse(
+        /*var payload = new ErrorResponse(
             TraceId: traceId,
             Status: StatusCodes.Status400BadRequest,
             Title: "Validation failed",
             Detail: "One or more validation errors occurred.",
-            Errors: errors);
+            Errors: errors);*/
+        var payload = ErrorFactory.ValidationFailed(
+            traceId,
+            "One or more validation errors occurred.",
+            errors);
         
         return new BadRequestObjectResult(payload);
     };
@@ -87,12 +92,14 @@ builder.Services.AddRateLimiter(options =>
         http.Response.StatusCode = StatusCodes.Status429TooManyRequests;
         http.Response.ContentType = "application/json";
 
-        var payload = new ErrorResponse(
+        /*var payload = new ErrorResponse(
             TraceId: traceId,
             Status: StatusCodes.Status429TooManyRequests,
             Title: "Too many requests",
             Detail: "Rate limit exceeded. Please try again later.",
-            Errors: null);
+            Errors: null);*/
+
+        var payload = ErrorFactory.TooManyRequests(traceId);
 
         await http.Response.WriteAsJsonAsync(payload, ct);
     };

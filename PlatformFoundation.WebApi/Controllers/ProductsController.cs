@@ -6,6 +6,7 @@ using PlatformFoundation.Application.Features.Products.GetProductById;
 using PlatformFoundation.Application.Features.Products.ListProducts;
 using PlatformFoundation.WebApi.Contracts.Requests;
 using PlatformFoundation.WebApi.Contracts.Responses;
+using PlatformFoundation.WebApi.Errors;
 using PlatformFoundation.WebApi.Extensions;
 
 namespace PlatformFoundation.WebApi.Controllers;
@@ -43,11 +44,12 @@ public sealed class ProductsController : ControllerBase
         var result = await _getById.Handle(new GetProductByIdQuery(id), ct);
 
         if (result is null)
-            return NotFound(new ErrorResponse(
+            /*return NotFound(new ErrorResponse(
                 TraceId: HttpContext.GetCorrelationId(),
                 Status: StatusCodes.Status404NotFound,
                 Title: "Not found",
-                Detail: "Product not found."));
+                Detail: "Product not found."));*/
+            return NotFound(ErrorFactory.NotFound(HttpContext.GetCorrelationId(), "Product not found."));
         
         return Ok(new ProductResponse(result.Id, result.Name, result.Price));
     }

@@ -8,4 +8,5 @@ public interface IProductRepository
     Task<Product?> GetById(Guid id, CancellationToken ct);
     Task<IReadOnlyList<Product>> List(int limit, int offset, CancellationToken ct);
     Task<int> Count(CancellationToken ct);
+    Task<bool> ExistsByName(string name, CancellationToken ct);
 }

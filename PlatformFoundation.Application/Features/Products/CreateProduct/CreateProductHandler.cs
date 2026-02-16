@@ -1,5 +1,6 @@
 using PlatformFoundation.Application.Contracts;
 using PlatformFoundation.Domain.Entities;
+using PlatformFoundation.Domain.Exceptions;
 
 namespace PlatformFoundation.Application.Features.Products.CreateProduct;
 
@@ -18,6 +19,9 @@ public sealed class CreateProductHandler
 
     public async Task<CreateProductResult> Handle(CreateProductCommand cmd, CancellationToken ct)
     {
+        if (await _products.ExistsByName(cmd.Name, ct))
+            throw new DomainConflictException("Product name already exists");
+        
         var product = Product.Create(cmd.Name, cmd.Price);
         
         await _products.Add(product, ct);
