@@ -20,7 +20,7 @@ public sealed class CreateProductHandler
     public async Task<CreateProductResult> Handle(CreateProductCommand cmd, CancellationToken ct)
     {
         if (await _products.ExistsByName(cmd.Name, ct))
-            throw new DomainConflictException("Product name already exists");
+            throw new DomainConflictException("Products name already exists");
         
         var product = Product.Create(cmd.Name, cmd.Price);
         

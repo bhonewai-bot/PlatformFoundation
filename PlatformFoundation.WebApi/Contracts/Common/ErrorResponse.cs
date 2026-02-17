@@ -1,4 +1,4 @@
-namespace PlatformFoundation.WebApi.Contracts.Responses;
+namespace PlatformFoundation.WebApi.Contracts.Common;
 
 public sealed record ErrorResponse(
     string TraceId,

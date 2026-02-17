@@ -1,4 +1,4 @@
-namespace PlatformFoundation.WebApi.Contracts.Responses;
+namespace PlatformFoundation.WebApi.Contracts.Products.Responses;
 
 public record ListProductsResponse(
     int Limit,

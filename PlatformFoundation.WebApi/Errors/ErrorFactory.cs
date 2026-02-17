@@ -1,4 +1,5 @@
-using PlatformFoundation.WebApi.Contracts.Responses;
+using PlatformFoundation.WebApi.Contracts.Common;
+using PlatformFoundation.WebApi.Contracts.Products.Responses;
 
 namespace PlatformFoundation.WebApi.Errors;
 

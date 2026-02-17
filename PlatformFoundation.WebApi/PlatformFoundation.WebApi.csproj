@@ -20,4 +20,9 @@
       <ProjectReference Include="..\PlatformFoundation.Infrastructure\PlatformFoundation.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Contracts\Ping\Requests\" />
+      <Folder Include="Contracts\Products\" />
+    </ItemGroup>
+
 </Project>

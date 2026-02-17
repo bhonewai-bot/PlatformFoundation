@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformFoundation.Application.Features.Ping.GetPing;
-using PlatformFoundation.WebApi.Contracts.Responses;
+using PlatformFoundation.WebApi.Contracts.Ping.Responses;
 
 namespace PlatformFoundation.WebApi.Controllers
 {

@@ -1,7 +1,8 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PlatformFoundation.WebApi.Contracts.Responses;
+using PlatformFoundation.WebApi.Contracts.Common;
+using PlatformFoundation.WebApi.Contracts.Products.Responses;
 
 namespace PlatformFoundation.WebApi.Controllers;
 

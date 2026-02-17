@@ -13,13 +13,13 @@ public sealed class Product
     private Product(Guid id, string name, decimal price)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainValidationException("Product name is required");
+            throw new DomainValidationException("Products name is required");
         
         if (name.Length > 100)
-            throw new DomainValidationException("Product name is too long");
+            throw new DomainValidationException("Products name is too long");
         
         if (price <= 0)
-            throw new DomainValidationException("Product price must be greater than 0.");
+            throw new DomainValidationException("Products price must be greater than 0.");
         
         Id = id;
         Name = name;

@@ -32,7 +32,7 @@ public sealed class ProductsApiTests :  IClassFixture<PostgresFixture>
 
         var req = new
         {
-            name = "IntegrationTest Product",
+            name = "IntegrationTest Products",
             price = 12.34
         };
         
@@ -46,7 +46,7 @@ public sealed class ProductsApiTests :  IClassFixture<PostgresFixture>
 
         var body = await get.Content.ReadFromJsonAsync<ProductResponse>();
         body.Should().NotBeNull();
-        body!.Name.Should().Be("IntegrationTest Product");
+        body!.Name.Should().Be("IntegrationTest Products");
         body.Price.Should().Be(12.34m);
         
         res.Headers.TryGetValues("X-Correlation-ID", out var cids).Should().BeTrue();

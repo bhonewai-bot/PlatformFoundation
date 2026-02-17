@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PlatformFoundation.WebApi.Contracts.Requests;
+namespace PlatformFoundation.WebApi.Contracts.Products.Requests;
 
 public sealed record CreateProductRequest(
     [param: Required]

@@ -22,7 +22,7 @@ namespace PlatformFoundation.Infrastructure.AppDbContext.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("PlatformFoundation.Domain.Entities.Product", b =>
+            modelBuilder.Entity("PlatformFoundation.Domain.Entities.Products", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using PlatformFoundation.Application;
 using PlatformFoundation.Infrastructure;
-using PlatformFoundation.WebApi.Contracts.Responses;
 using PlatformFoundation.WebApi.Extensions;
 using PlatformFoundation.WebApi.Middlewares;
 using Serilog;
@@ -41,13 +40,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             .ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
-
-        /*var payload = new ErrorResponse(
-            TraceId: traceId,
-            Status: StatusCodes.Status400BadRequest,
-            Title: "Validation failed",
-            Detail: "One or more validation errors occurred.",
-            Errors: errors);*/
+        
         var payload = ErrorFactory.ValidationFailed(
             traceId,
             "One or more validation errors occurred.",
@@ -91,13 +84,6 @@ builder.Services.AddRateLimiter(options =>
 
         http.Response.StatusCode = StatusCodes.Status429TooManyRequests;
         http.Response.ContentType = "application/json";
-
-        /*var payload = new ErrorResponse(
-            TraceId: traceId,
-            Status: StatusCodes.Status429TooManyRequests,
-            Title: "Too many requests",
-            Detail: "Rate limit exceeded. Please try again later.",
-            Errors: null);*/
 
         var payload = ErrorFactory.TooManyRequests(traceId);
 
