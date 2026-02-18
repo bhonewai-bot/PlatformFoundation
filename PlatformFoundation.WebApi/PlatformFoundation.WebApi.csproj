@@ -25,4 +25,8 @@
       <Folder Include="Contracts\Products\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\realtime-test.html" />
+    </ItemGroup>
+
 </Project>

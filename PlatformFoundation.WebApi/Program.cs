@@ -10,6 +10,7 @@ using Serilog.Events;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using PlatformFoundation.WebApi.Errors;
+using PlatformFoundation.WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         return new BadRequestObjectResult(payload);
     };
 });
+
+builder.Services.AddSignalR();
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -141,6 +144,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.MapHub<NotificationsHub>("/hubs/notifications");
+
 app.MapControllers();
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions()
@@ -153,6 +158,8 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions()
     Predicate = r => r.Tags.Contains("ready"),
     ResponseWriter = HealthResponseWriter.WriteJsonResponse
 });
+
+app.UseStaticFiles();
 
 app.Run();
 

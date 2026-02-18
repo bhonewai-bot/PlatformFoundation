@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
+</head>
+<body>
+    <button id="connect">Connect</button>
+    <button id="ping">Send Ping</button>
+    <pre id="out"></pre>
+
+    <script>
+        const out = document.getElementById("out");
+        let connection;
+        
+        function log(x) { 
+            out.textContent += x + "\n";
+        }
+        
+        document.getElementById("connect").onclick = async () => {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/notifications")
+                .withAutomaticReconnect()
+                .build();
+            
+            connection.on("ping", (msg) => log(JSON.stringify(msg, null, 2)));
+            
+            await connection.start();
+            log("connected");
+        }
+        
+        document.getElementById("ping").onclick = async () => {
+            await connection.invoke("SendPing", "hello from browser");
+            log("ping sent");
+        }
+    </script>
+</body>
+</html>
