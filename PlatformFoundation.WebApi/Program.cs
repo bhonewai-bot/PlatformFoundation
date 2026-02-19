@@ -11,6 +11,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using PlatformFoundation.WebApi.Errors;
 using PlatformFoundation.WebApi.Hubs;
+using PlatformFoundation.WebApi.Realtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live", "ready" });
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddScoped<IRealtimePublisher, RealtimePublisher>();
 
 builder.Services.AddControllers();
 

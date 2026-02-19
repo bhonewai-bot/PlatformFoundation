@@ -6,8 +6,10 @@ using PlatformFoundation.Application.Features.Products.GetProductById;
 using PlatformFoundation.Application.Features.Products.ListProducts;
 using PlatformFoundation.WebApi.Contracts.Products.Requests;
 using PlatformFoundation.WebApi.Contracts.Products.Responses;
+using PlatformFoundation.WebApi.Contracts.Realtime.Events;
 using PlatformFoundation.WebApi.Errors;
 using PlatformFoundation.WebApi.Extensions;
+using PlatformFoundation.WebApi.Realtime;
 
 namespace PlatformFoundation.WebApi.Controllers;
 
@@ -18,12 +20,14 @@ public sealed class ProductsController : ControllerBase
     private readonly CreateProductHandler _create;
     private readonly GetProductByIdHandler _getById;
     private readonly ListProductsHandler _list;
+    private readonly IRealtimePublisher _realtime;
 
-    public ProductsController(CreateProductHandler create, GetProductByIdHandler getById, ListProductsHandler list)
+    public ProductsController(CreateProductHandler create, GetProductByIdHandler getById, ListProductsHandler list, IRealtimePublisher realtime)
     {
         _create = create;
         _getById = getById;
         _list = list;
+        _realtime = realtime;
     }
 
     [EnableRateLimiting("write-strict")]
@@ -35,6 +39,13 @@ public sealed class ProductsController : ControllerBase
         
         var response = new ProductResponse(result.Id, result.Name, result.Price);
         
+        await _realtime.PublishToTopic(
+            topic: "products",
+            type: "product.created",
+            version: 1,
+            data: new ProductCreatedEvent(response.Id, response.Name, response.Price),
+            ct: ct);
+        
         return Created($"/api/products/{response.Id}", response);
     }
 
@@ -44,11 +55,6 @@ public sealed class ProductsController : ControllerBase
         var result = await _getById.Handle(new GetProductByIdQuery(id), ct);
 
         if (result is null)
-            /*return NotFound(new ErrorResponse(
-                TraceId: HttpContext.GetCorrelationId(),
-                Status: StatusCodes.Status404NotFound,
-                Title: "Not found",
-                Detail: "Products not found."));*/
             return NotFound(ErrorFactory.NotFound(HttpContext.GetCorrelationId(), "Products not found."));
         
         return Ok(new ProductResponse(result.Id, result.Name, result.Price));

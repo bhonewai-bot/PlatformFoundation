@@ -56,7 +56,7 @@
             connection.onclose(() => log(["closed"]));
             
             await connection.start();
-            // log("connected");
+            log("connected");
         };
         
         document.getElementById("ping").onclick = async () => {
