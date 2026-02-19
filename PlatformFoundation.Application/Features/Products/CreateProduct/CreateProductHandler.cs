@@ -10,9 +10,9 @@ public sealed class CreateProductHandler
     private readonly IProductAuditLogRepository _audit;
     private readonly IUnitOfWork _uow;
 
-    public CreateProductHandler(IProductRepository repo, IProductAuditLogRepository audit, IUnitOfWork uow)
+    public CreateProductHandler(IProductRepository products, IProductAuditLogRepository audit, IUnitOfWork uow)
     {
-        _products = repo;
+        _products = products;
         _audit = audit;
         _uow = uow;
     }

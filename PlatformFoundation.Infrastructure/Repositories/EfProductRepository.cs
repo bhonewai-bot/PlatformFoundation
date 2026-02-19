@@ -52,4 +52,34 @@ public sealed class EfProductRepository : IProductRepository
             .AsNoTracking()
             .AnyAsync(x => x.Name.ToLower() == normalized, ct);
     }
+
+    public Task<bool> ExistsByNameExceptId(string name, Guid excludeId, CancellationToken ct)
+    {
+        var normalized = name.Trim().ToLower();
+        return _db.Products
+            .AsNoTracking()
+            .AnyAsync(x => x.Name.ToLower() == normalized && x.Id != excludeId, ct);
+    }
+
+    public async Task<Product?> Update(Guid id, string name, decimal price, CancellationToken ct)
+    {
+        var existingProduct = await _db.Products.FirstOrDefaultAsync(x => x.Id == id, ct);
+        
+        if (existingProduct is null)
+            return null;
+        
+        existingProduct.Update(name, price);
+        
+        return existingProduct;
+    }
+
+    public async Task<bool> Delete(Guid id, CancellationToken ct)
+    {
+        var existingProduct = await _db.Products.FirstOrDefaultAsync(x => x.Id == id, ct);
+        if (existingProduct is null)
+            return false;
+        
+        _db.Products.Remove(existingProduct);
+        return true;
+    }
 }

@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using PlatformFoundation.Application.Features.Products.CreateProduct;
+using PlatformFoundation.Application.Features.Products.DeleteProduct;
 using PlatformFoundation.Application.Features.Products.GetProductById;
 using PlatformFoundation.Application.Features.Products.ListProducts;
+using PlatformFoundation.Application.Features.Products.UpdateProduct;
 using PlatformFoundation.WebApi.Contracts.Products.Requests;
 using PlatformFoundation.WebApi.Contracts.Products.Responses;
 using PlatformFoundation.WebApi.Contracts.Realtime.Events;
@@ -21,13 +23,17 @@ public sealed class ProductsController : ControllerBase
     private readonly GetProductByIdHandler _getById;
     private readonly ListProductsHandler _list;
     private readonly IRealtimePublisher _realtime;
+    private readonly UpdateProductHandler _update;
+    private readonly DeleteProductHandler _delete;
 
-    public ProductsController(CreateProductHandler create, GetProductByIdHandler getById, ListProductsHandler list, IRealtimePublisher realtime)
+    public ProductsController(CreateProductHandler create, GetProductByIdHandler getById, ListProductsHandler list, IRealtimePublisher realtime, UpdateProductHandler update, DeleteProductHandler delete)
     {
         _create = create;
         _getById = getById;
         _list = list;
         _realtime = realtime;
+        _update = update;
+        _delete = delete;
     }
 
     [EnableRateLimiting("write-strict")]
@@ -55,7 +61,7 @@ public sealed class ProductsController : ControllerBase
         var result = await _getById.Handle(new GetProductByIdQuery(id), ct);
 
         if (result is null)
-            return NotFound(ErrorFactory.NotFound(HttpContext.GetCorrelationId(), "Products not found."));
+            return NotFound(ErrorFactory.NotFound(HttpContext.GetCorrelationId(), "Product not found."));
         
         return Ok(new ProductResponse(result.Id, result.Name, result.Price));
     }
@@ -72,5 +78,46 @@ public sealed class ProductsController : ControllerBase
             result.Items.Select(x => new ProductListItemResponse(x.Id, x.Name, x.Price)).ToList());
         
         return Ok(response);
+    }
+
+    [EnableRateLimiting("write-strict")]
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ProductResponse>> Update(Guid id, [FromBody] UpdateProductRequest request,
+        CancellationToken ct)
+    {
+        var result = await _update.Handle(new UpdateProductCommand(id, request.Name, request.Price), ct);
+        
+        if (result is null)
+            return NotFound(ErrorFactory.NotFound(HttpContext.GetCorrelationId(), "Product not found."));
+        
+        var response = new ProductResponse(result.Id, result.Name, result.Price);
+        
+        await _realtime.PublishToTopic(
+            topic: "products",
+            type: "product.updated",
+            version: 1,
+            data: new ProductUpdatedEvent(response.Id, response.Name, response.Price),
+            ct: ct);
+        
+        return Ok(response);
+    }
+
+    [EnableRateLimiting("write-strict")]
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        var result = await _delete.Handle(new DeleteProductCommand(id), ct);
+        
+        if (result is null)
+            return NotFound(ErrorFactory.NotFound(HttpContext.GetCorrelationId(), "Product not found."));
+        
+        await _realtime.PublishToTopic<object>(
+            topic: "products",
+            type: "product.deleted",
+            version: 1,
+            data: new ProductDeletedEvent(id),
+            ct: ct);
+
+        return NotFound("Product deleted successfully.");
     }
 }

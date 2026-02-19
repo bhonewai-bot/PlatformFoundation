@@ -18,4 +18,6 @@ public class ProductAuditLog
     }
 
     public static ProductAuditLog Created(Guid productId) => new ProductAuditLog(productId, "created");
+    
+    public static ProductAuditLog Deleted(Guid productId) => new ProductAuditLog(productId, "deleted");
 }
