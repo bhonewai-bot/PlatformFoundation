@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>SignalR Test</title>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
 </head>
 <body>
@@ -10,12 +10,36 @@
     <button id="ping">Send Ping</button>
     <pre id="out"></pre>
 
+    <input id="userId" value="1" />
+    <button id="joinUser">Join User</button>
+    <button id="sendUser">Send User</button>
+
+    <input id="topic" value="alerts" />
+    <button id="joinTopic">Join Topic</button>
+    <button id="sendTopic">Send Topic</button>
+
     <script>
         const out = document.getElementById("out");
         let connection;
         
-        function log(x) { 
+        function log(x) {
             out.textContent += x + "\n";
+        }
+        
+        function pretty(x) {
+            try { 
+                return JSON.stringify(x, null, 2); 
+            } catch {
+                return log(x);
+            }
+        }
+        
+        function ensureConnected() {
+            if (!connection || connection.state !== signalR.HubConnectionState.Connected) {
+                log("[Warn] Not connected. Click Connect first.");
+                return false;
+            }
+            return true;
         }
         
         document.getElementById("connect").onclick = async () => {
@@ -24,15 +48,49 @@
                 .withAutomaticReconnect()
                 .build();
             
-            connection.on("ping", (msg) => log(JSON.stringify(msg, null, 2)));
+            connection.on("system", (msg) => log(pretty(msg)));
+            connection.on("realtime", (msg) => log(pretty(msg)));
+            
+            connection.onreconnecting(() => log("[reconnecting]"));
+            connection.onreconnected(() => log("[reconnected]"));
+            connection.onclose(() => log(["closed"]));
             
             await connection.start();
-            log("connected");
-        }
+            // log("connected");
+        };
         
         document.getElementById("ping").onclick = async () => {
-            await connection.invoke("SendPing", "hello from browser");
-            log("ping sent");
+            if (!ensureConnected()) return;
+            await connection.invoke("SendPing", "Hello from browser")
+            // log("ping sent");
+        }
+        
+        document.getElementById("joinUser").onclick = async () => {
+            if (!ensureConnected()) return;
+            const userId = document.getElementById("userId").value;
+            await connection.invoke("JoinUser", userId)
+            // log("joined user: " + userId);
+        }
+        
+        document.getElementById("sendUser").onclick = async () => {
+            if (!ensureConnected()) return;
+            const userId = document.getElementById("userId").value;
+            await connection.invoke("SendToUser", userId, "hello user group");
+            // log("sent to user: " + userId);
+        }
+        
+        document.getElementById("joinTopic").onclick = async () => {
+            if (!ensureConnected()) return;
+            const topic = document.getElementById("topic").value;
+            await connection.invoke("JoinTopic", topic);
+            // log("joined topic: " + topic);
+        }
+        
+        document.getElementById("sendTopic").onclick = async () => {
+            if (!ensureConnected()) return;
+            const topic = document.getElementById("topic").value;
+            await connection.invoke("SendToTopic", topic, "hello topic group");
+            // log("sent to topic: " + topic);
         }
     </script>
 </body>
